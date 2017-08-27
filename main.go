@@ -1,40 +1,63 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"io/ioutil"
+	"math/big"
 	"os"
 
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
 var (
-	version   = ""
-	buildTime = ""
+	version = ""
 )
 
 func init() {
-	// Loads from configuration file, if it exists
+	if version == "" {
+		bytes, err := ioutil.ReadFile("VERSION")
+		if err != nil {
+			panic(err)
+		}
+		version = string(bytes)
+	}
 
 	pflag.Usage = func() {
-		fmt.Fprintf(os.Stderr, `To Do`)
-		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "Deniable encryption application to prevent brute-force attacks\n")
+		fmt.Fprintf(os.Stderr, "Usage of:\n")
 		pflag.PrintDefaults()
 	}
 
-	//pflag.Bool("debug", false, "Sets log level to debug.")
+	pflag.Bool("debug", false, "Sets log level to debug.")
+	viper.BindPFlag("debug", pflag.Lookup("debug"))
 	pflag.Parse()
 
-	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	if !viper.GetBool("debug") {
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	}
 }
 
 func main() {
-	base := int64(4)
-	exp := int64(13)
-	modulus := int64(497)
+	ctx := context.Background()
+	logger := log.With().Str("version", version).Logger()
+	ctx = logger.WithContext(ctx)
 
-	fmt.Println(ModExpGoBigInteger(base, exp, modulus))
-	fmt.Println(ModExpGoBigIntegerExp(base, exp, modulus))
-	fmt.Println(ModExp(base, exp, modulus))
-	fmt.Println(ModExpWithSquaring(base, exp, modulus))
+	m := big.NewInt(int64(99999999))
+
+	coins := CreateCoins()
+	logger.Debug().
+		Str("pk_d", coins.PrivateKey.D.String()).
+		Int("pk_e", coins.PrivateKey.E).
+		Str("pk_n", coins.PrivateKey.N.String()).
+		Int64("a", coins.A).
+		Str("g", coins.G.String()).
+		Str("h", coins.H.String()).
+		Msg("Coins was created")
+
+	c := encryption(ctx, m, coins)
+	decryption(ctx, c, coins)
 }
