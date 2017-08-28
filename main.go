@@ -46,18 +46,21 @@ func main() {
 	logger := log.With().Str("version", version).Logger()
 	ctx = logger.WithContext(ctx)
 
-	m := big.NewInt(int64(99999999))
+	m1 := big.NewInt(int64(9))
+	m2 := big.NewInt(int64(10))
 
-	coins := CreateCoins()
+	keys := getKeys(32)
 	logger.Debug().
-		Str("pk_d", coins.PrivateKey.D.String()).
-		Int("pk_e", coins.PrivateKey.E).
-		Str("pk_n", coins.PrivateKey.N.String()).
-		Int64("a", coins.A).
-		Str("g", coins.G.String()).
-		Str("h", coins.H.String()).
-		Msg("Coins was created")
+		Str("sk_p", keys.PrivateKey.p.String()).
+		Str("sk_q", keys.PrivateKey.q.String()).
+		Str("sk_a", keys.PrivateKey.a.String()).
+		Str("pk_N", keys.PublicKey.N.String()).
+		Str("pk_g", keys.PublicKey.g.String()).
+		Str("pk_h", keys.PublicKey.h.String()).
+		Msg("Keys was created")
 
-	c := encryption(ctx, m, coins)
-	decryption(ctx, c, coins)
+	c, r1, m1 := Encryption(ctx, m1, keys.PublicKey)
+	Decryption(ctx, c, r1, keys)
+	r2 := CollisionFinder(ctx, m1, m2, r1, keys)
+	Decryption(ctx, c, r2, keys)
 }
