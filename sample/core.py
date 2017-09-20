@@ -30,7 +30,7 @@ def multiplicative_inverse(e, phi):
 def generate_keypair(p, q):
     n = p * q
     phi = lcm((p-1), (q-1))
-    e = 17
+    e = 65537
     g = gcd(e, phi)
     while g != 1:
         e = random.randrange(1, phi)
@@ -40,23 +40,21 @@ def generate_keypair(p, q):
     return ((e, n), (d, n))
 
 def encryption(e, N, m):
-    return pow_mod(m, e, N)
+    return pow(m, e, N)
 
 def decryption(d, N, c):
-    return math.ceil(pow_mod(c, d, N))
-
+    if d == (d//1):
+        return pow(c, d, N)
+    else:
+        return round((c**d) % N)
+        
 def collisionFinder(m2, C, N):
     """D2 = log(M2 + N) / log(C)"""
     return Decimal(math.log(m2 + N))/Decimal(math.log(C))
 
-def pow_mod(x,e,m):
-    """(x**e) mod m"""
-    return (x**e) % m
-    # return pow(x,e,m)
-
 def main():
-    p = 61
-    q = 53
+    p = 104723
+    q = 104729
     public, private = generate_keypair(p, q)
 
     e = public[0]
@@ -69,7 +67,7 @@ def main():
 
     print()
 
-    m = 65
+    m = 9965465490
     print("m:   ", m)
     c = encryption(e, N, m)
     print("c:   ", c)
@@ -79,7 +77,7 @@ def main():
 
     print()
 
-    m2 = 19
+    m2 = 878974658
     print("m2:  ", m2)
     d2 = collisionFinder(m2, c, N)
     print("d2:  ", d2)
