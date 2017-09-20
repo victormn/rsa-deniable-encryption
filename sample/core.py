@@ -43,26 +43,16 @@ def encryption(e, N, m):
     return pow_mod(m, e, N)
 
 def decryption(d, N, c):
-    return pow_mod(c, d, N)
+    return math.ceil(pow_mod(c, d, N))
 
-def collisionFinder(m1, m2, e1, N):
-    """E2 = log(M1^E1 + N) / log(M2)"""
-    return Decimal(math.log((pow(m1, e1) + N)))/Decimal(math.log(m2))
+def collisionFinder(m2, C, N):
+    """D2 = log(M2 + N) / log(C)"""
+    return Decimal(math.log(m2 + N))/Decimal(math.log(C))
 
 def pow_mod(x,e,m):
     """(x**e) mod m"""
-    # X = x
-    # E = e
-    # Y = 1
-    # while E > 0:
-    #     if E % 2 == 0:
-    #         X = (X * X) % m
-    #         E = E/2
-    #     else:
-    #         Y = (X * Y) % m
-    #         E = E - 1
-    # return Y
-    return pow(x,e,m)
+    return (x**e) % m
+    # return pow(x,e,m)
 
 def main():
     p = 61
@@ -72,7 +62,6 @@ def main():
     e = public[0]
     N = public[1]
     d = private[0]
-    phi = lcm((p-1), (q-1))
 
     print("e:   ", e)
     print("N:   ", N)
@@ -92,11 +81,7 @@ def main():
 
     m2 = 19
     print("m2:  ", m2)
-    e2 = collisionFinder(m, m2, e, N)
-    print("e2:  ", e2)
-    c2 = encryption(e2, N, m2)
-    print("c2:  ", c2)
-    d2 = multiplicative_inverse(e2, phi)
+    d2 = collisionFinder(m2, c, N)
     print("d2:  ", d2)
     mf2 = decryption(d2, N, c)
     print("mf2: ", mf2)
