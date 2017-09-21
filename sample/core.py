@@ -1,33 +1,53 @@
+"""
+# TODO: Describe this project here
+"""
+
 import math
 import random
+from decimal import Decimal, getcontext
 from functools import reduce
-from decimal import *
-getcontext().prec = 50
+from Crypto.Util import number
+
+getcontext().prec = 20
 
 def gcd(*numbers):
+    """# TODO: Describe this method here"""
     from fractions import gcd
     return reduce(gcd, numbers)
 
 def lcm(*numbers):
+    """# TODO: Describe this method here"""
     def lcm(a, b):
         return (a * b) // gcd(a, b)
     return reduce(lcm, numbers, 1)
 
-def multiplicative_inverse(e, phi):
-    x = 0
-    lx = 1
-    oldPhi = phi
+def multiplicative_inverse(exp, phi):
+    """# TODO: Describe this method here"""
+    aux1 = 0
+    aux2 = 1
+    old_phi = phi
     while phi != 0:
-        q = e // phi
-        (e, phi) = (phi, e % phi)
-        (x, lx) = ((lx - (q * x)), x)
-   
-    if lx < 0:
-        lx = lx + oldPhi
+        aux3 = exp // phi
+        (exp, phi) = (phi, exp % phi)
+        (aux1, aux2) = ((aux2 - (aux3 * aux1)), aux1)
 
-    return lx
+    if aux2 < 0:
+        aux2 = aux2 + old_phi
 
-def generate_keypair(p, q):
+    return aux2
+
+def generate_keypair():
+    """Generates RSA public and private key"""
+    p = 33421979
+    q = 58320289
+    # p = q = 1
+    # while number.size(p*q) < 52:
+        # p = rand_prime(26)
+        # q = rand_prime(26)
+
+    if p > q:
+        (p, q) = (q, p)
+
     n = p * q
     phi = lcm((p-1), (q-1))
     e = 65537
@@ -37,52 +57,49 @@ def generate_keypair(p, q):
         g = gcd(e, phi)
 
     d = multiplicative_inverse(e, phi)  
-    return ((e, n), (d, n))
+    return ({'e': e, 'N': n}, {'d': d, 'N': n})
 
-def encryption(e, N, m):
-    return pow(m, e, N)
+def encryption(message, exp, modulus):
+    """C = (message ** exp) mod modulus"""
+    return pow(message, exp, modulus)
 
-def decryption(d, N, c):
-    if d == (d//1):
-        return pow(c, d, N)
-    else:
-        return round((c**d) % N)
-        
-def collisionFinder(m2, C, N):
-    """D2 = log(M2 + N) / log(C)"""
-    return Decimal(math.log(m2 + N))/Decimal(math.log(C))
+def decryption(cipher, exp, modulus):
+    """M = (cipher ** exp) % modulus"""
+    if exp == (exp//1):
+        return pow(cipher, exp, modulus)
+
+    return round((cipher**exp) % modulus)
+
+def collision_finder(message, cipher, modulus):
+    """D2 = log(message + N) / log(C)"""
+    return Decimal(Decimal(math.log(message + modulus))/Decimal(math.log(cipher)))
 
 def main():
-    p = 104723
-    q = 104729
-    public, private = generate_keypair(p, q)
+    """# TODO: Describe this method here"""
+    pk, sk = generate_keypair()
 
-    e = public[0]
-    N = public[1]
-    d = private[0]
-
-    print("e:   ", e)
-    print("N:   ", N)
-    print("d:   ", d)
+    print("e:   ", pk['e'])
+    print("N:   ", pk['N'])
+    print("d:   ", sk['d'])
 
     print()
 
-    m = 9965465490
-    print("m:   ", m)
-    c = encryption(e, N, m)
-    print("c:   ", c)
-    mf = decryption(d, N, c)
-    print("mf:  ", mf)
-
+    # TODO: separar entrada de 10 em 10 numeros
+    message1 = 1234567890
+    print("m:   ", message1)
+    cipher = encryption(message1, pk['e'], pk['N'])
+    print("c:   ", cipher)
+    decripted = decryption(cipher, sk['d'], pk['N'])
+    print("m:   ", decripted)
 
     print()
 
-    m2 = 878974658
-    print("m2:  ", m2)
-    d2 = collisionFinder(m2, c, N)
-    print("d2:  ", d2)
-    mf2 = decryption(d2, N, c)
-    print("mf2: ", mf2)
+    message2 = 9876543210
+    print("m2:  ", message2)
+    sk_d2 = collision_finder(message2, cipher, pk['N'])
+    print("d2:  ", sk_d2)
+    decripted2 = decryption(cipher, sk_d2, pk['N'])
+    print("m2:  ", decripted2)
 
 
 if __name__ == '__main__':
