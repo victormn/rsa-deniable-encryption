@@ -4,21 +4,21 @@ Development file to implement a deniable encryption cryptosystem
 
 import math
 import random
-from decimal import Decimal, getcontext
-from functools import reduce
+import decimal
+import functools
 
-getcontext().prec = 20
+decimal.getcontext().prec = 20
 
 def get_gcd(*numbers):
     """Return the greatest common divisor from numbers."""
     from fractions import gcd
-    return reduce(gcd, numbers)
+    return functools.reduce(gcd, numbers)
 
 def get_lcm(*numbers):
     """Return the least common multiple from numbers."""
     def lcm(a, b):
         return (a * b) // get_gcd(a, b)
-    return reduce(lcm, numbers, 1)
+    return functools.reduce(lcm, numbers, 1)
 
 def multiplicative_inverse(e, phi):
     """Return a multiplicative inverse of e mod phi."""
@@ -89,7 +89,7 @@ def decryption(c, d, N):
 def collision_finder(m2, c, N):
     """Find a RSA key parameter D such that the message m2 can be decrypted from cipher c
     D2 = log(m2 + N) / log(C)."""
-    return Decimal(Decimal(math.log(m2 + N))/Decimal(math.log(c)))
+    return decimal.Decimal(decimal.Decimal(math.log(m2 + N))/decimal.Decimal(math.log(c)))
 
 def main():
     """Do main stuffs (just for development)."""
