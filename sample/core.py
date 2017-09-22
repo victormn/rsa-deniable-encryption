@@ -1,82 +1,99 @@
 """
-# TODO: Describe this project here
+Development file to implement a deniable encryption cryptosystem
 """
 
 import math
 import random
 from decimal import Decimal, getcontext
 from functools import reduce
-from Crypto.Util import number
 
 getcontext().prec = 20
 
-def gcd(*numbers):
-    """# TODO: Describe this method here"""
+def get_gcd(*numbers):
+    """Return the greatest common divisor from numbers."""
     from fractions import gcd
     return reduce(gcd, numbers)
 
-def lcm(*numbers):
-    """# TODO: Describe this method here"""
+def get_lcm(*numbers):
+    """Return the least common multiple from numbers."""
     def lcm(a, b):
-        return (a * b) // gcd(a, b)
+        return (a * b) // get_gcd(a, b)
     return reduce(lcm, numbers, 1)
 
-def multiplicative_inverse(exp, phi):
-    """# TODO: Describe this method here"""
-    aux1 = 0
-    aux2 = 1
-    old_phi = phi
+def multiplicative_inverse(e, phi):
+    """Return a multiplicative inverse of e mod phi."""
+    x = 0
+    y = 1
+    old = phi
     while phi != 0:
-        aux3 = exp // phi
-        (exp, phi) = (phi, exp % phi)
-        (aux1, aux2) = ((aux2 - (aux3 * aux1)), aux1)
+        q = e // phi
+        (e, phi) = (phi, e % phi)
+        (x, y) = ((y - (q * x)), x)
 
-    if aux2 < 0:
-        aux2 = aux2 + old_phi
+    if y < 0:
+        y = y + old
 
-    return aux2
+    return y
 
-def generate_keypair():
-    """Generates RSA public and private key"""
-    p = 33421979
-    q = 58320289
-    # p = q = 1
-    # while number.size(p*q) < 52:
-        # p = rand_prime(26)
-        # q = rand_prime(26)
+def create_sieve(n):
+    """Return all primes <= n."""
+    np1 = n + 1
+    s = list(range(np1)) 
+    s[1] = 0
+    sqrtn = int(round(n**0.5))
+    for i in range(2, sqrtn + 1):
+        if s[i]:
+            s[i*i: np1: i] = [0] * len(range(i*i, np1, i))
+    return filter(None, s)
+
+def rand_prime(size, sieve):
+    """Return a random prime >= size using a sieve set."""
+    rand = random.randrange(2**(size-2), 2**size)
+    while not rand in sieve:
+        rand += 1
+    return rand
+
+def generate_keypair(size):
+    """Generates RSA public and private key."""
+    sieve = set(create_sieve(2**size))
+    p = rand_prime(size, sieve)
+    q = rand_prime(size, sieve)
 
     if p > q:
         (p, q) = (q, p)
 
     n = p * q
-    phi = lcm((p-1), (q-1))
+    phi = get_lcm((p-1), (q-1))
     e = 65537
-    g = gcd(e, phi)
+    g = get_gcd(e, phi)
     while g != 1:
         e = random.randrange(1, phi)
-        g = gcd(e, phi)
+        g = get_gcd(e, phi)
 
-    d = multiplicative_inverse(e, phi)  
+    d = multiplicative_inverse(e, phi)
     return ({'e': e, 'N': n}, {'d': d, 'N': n})
 
-def encryption(message, exp, modulus):
-    """C = (message ** exp) mod modulus"""
-    return pow(message, exp, modulus)
+def encryption(m, e, N):
+    """Encrypt message m as follow:
+    C = (m ** e) mod N."""
+    return pow(m, e, N)
 
-def decryption(cipher, exp, modulus):
-    """M = (cipher ** exp) % modulus"""
-    if exp == (exp//1):
-        return pow(cipher, exp, modulus)
+def decryption(c, d, N):
+    """Decrypt cipher c as follow:
+    M = (c ** d) % N."""
+    if d == (d//1):
+        return pow(c, d, N)
 
-    return round((cipher**exp) % modulus)
+    return round((c**d) % N)
 
-def collision_finder(message, cipher, modulus):
-    """D2 = log(message + N) / log(C)"""
-    return Decimal(Decimal(math.log(message + modulus))/Decimal(math.log(cipher)))
+def collision_finder(m2, c, N):
+    """Find a RSA key parameter D such that the message m2 can be decrypted from cipher c
+    D2 = log(m2 + N) / log(C)."""
+    return Decimal(Decimal(math.log(m2 + N))/Decimal(math.log(c)))
 
 def main():
-    """# TODO: Describe this method here"""
-    pk, sk = generate_keypair()
+    """Do main stuffs (just for development)."""
+    pk, sk = generate_keypair(22)
 
     print("e:   ", pk['e'])
     print("N:   ", pk['N'])
@@ -84,23 +101,21 @@ def main():
 
     print()
 
-    # TODO: separar entrada de 10 em 10 numeros
-    message1 = 1234567890
-    print("m:   ", message1)
-    cipher = encryption(message1, pk['e'], pk['N'])
-    print("c:   ", cipher)
-    decripted = decryption(cipher, sk['d'], pk['N'])
-    print("m:   ", decripted)
+    m1 = 1234567890
+    print("m:   ", m1)
+    c = encryption(m1, pk['e'], pk['N'])
+    print("c:   ", c)
+    mf = decryption(c, sk['d'], pk['N'])
+    print("m:   ", mf)
 
     print()
 
-    message2 = 9876543210
-    print("m2:  ", message2)
-    sk_d2 = collision_finder(message2, cipher, pk['N'])
+    m2 = 9876543210
+    print("m2:  ", m2)
+    sk_d2 = collision_finder(m2, c, pk['N'])
     print("d2:  ", sk_d2)
-    decripted2 = decryption(cipher, sk_d2, pk['N'])
-    print("m2:  ", decripted2)
-
+    mf2 = decryption(c, sk_d2, pk['N'])
+    print("m2:  ", mf2)
 
 if __name__ == '__main__':
     main()
