@@ -48,8 +48,9 @@ def _rand_prime(size, sieve):
         rand += 1
     return rand
 
-def generate_keypair(size):
+def generate_keypair():
     """Generates RSA public and private key."""
+    size = 22
     sieve = set(_create_sieve(2**size))
     pk_p = _rand_prime(size, sieve)
     pk_q = _rand_prime(size, sieve)
