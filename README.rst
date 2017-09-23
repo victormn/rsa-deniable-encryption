@@ -1,5 +1,5 @@
 RSA Deniable Encryption
------------------------
+=======================
 
 Deniable encryption application of a RSA cryptosystem
 
