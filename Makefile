@@ -1,4 +1,4 @@
 # Deniable Encryption Makefile
 
 all:
-	@python3 sample/core.py 
+	@python3 sample/core.py
