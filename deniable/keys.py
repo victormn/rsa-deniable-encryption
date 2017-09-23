@@ -1,3 +1,5 @@
+"""Defines RSA public and private keys"""
+
 import random
 import functools
 
@@ -8,35 +10,36 @@ def _gcd(*numbers):
 
 def _lcm(*numbers):
     """Return the least common multiple from numbers."""
-    def lcm(a, b):
-        return (a * b) // _gcd(a, b)
+    def lcm(num1, num2):
+        """Return the least common multiple from two numbers."""
+        return (num1 * num2) // _gcd(num1, num2)
     return functools.reduce(lcm, numbers, 1)
 
-def _multiplicative_inverse(e, phi):
+def _multiplicative_inverse(exp, phi):
     """Return a multiplicative inverse of e mod phi."""
-    x = 0
-    y = 1
+    aux1 = 0
+    aux2 = 1
     old = phi
     while phi != 0:
-        q = e // phi
-        (e, phi) = (phi, e % phi)
-        (x, y) = ((y - (q * x)), x)
+        aux3 = exp // phi
+        (exp, phi) = (phi, exp % phi)
+        (aux1, aux2) = ((aux2 - (aux3 * aux1)), aux1)
 
-    if y < 0:
-        y = y + old
+    if aux2 < 0:
+        aux2 = aux2 + old
 
-    return y
+    return aux2
 
-def _create_sieve(n):
-    """Return all primes <= n."""
-    np1 = n + 1
-    s = list(range(np1)) 
-    s[1] = 0
-    sqrtn = int(round(n**0.5))
+def _create_sieve(num):
+    """Return all primes <= num."""
+    np1 = num + 1
+    sli = list(range(np1))
+    sli[1] = 0
+    sqrtn = int(round(num**0.5))
     for i in range(2, sqrtn + 1):
-        if s[i]:
-            s[i*i: np1: i] = [0] * len(range(i*i, np1, i))
-    return filter(None, s)
+        if sli[i]:
+            sli[i*i: np1: i] = [0] * len(range(i*i, np1, i))
+    return filter(None, sli)
 
 def _rand_prime(size, sieve):
     """Return a random prime >= size using a sieve set."""
@@ -48,19 +51,19 @@ def _rand_prime(size, sieve):
 def generate_keypair(size):
     """Generates RSA public and private key."""
     sieve = set(_create_sieve(2**size))
-    p = _rand_prime(size, sieve)
-    q = _rand_prime(size, sieve)
+    pk_p = _rand_prime(size, sieve)
+    pk_q = _rand_prime(size, sieve)
 
-    if p > q:
-        (p, q) = (q, p)
+    if pk_p > pk_q:
+        (pk_p, pk_q) = (pk_q, pk_p)
 
-    n = p * q
-    phi = _lcm((p-1), (q-1))
-    e = 65537
-    g = _gcd(e, phi)
-    while g != 1:
-        e = random.randrange(1, phi)
-        g = _gcd(e, phi)
+    pk_n = pk_p * pk_q
+    phi = _lcm((pk_p-1), (pk_q-1))
+    pk_e = 65537
+    pk_g = _gcd(pk_e, phi)
+    while pk_g != 1:
+        pk_e = random.randrange(1, phi)
+        pk_g = _gcd(pk_e, phi)
 
-    d = _multiplicative_inverse(e, phi)
-    return ({'e': e, 'N': n}, {'d': d, 'N': n})
+    sk_d = _multiplicative_inverse(pk_e, phi)
+    return ({'e': pk_e, 'N': pk_n}, {'d': sk_d, 'N': pk_n})

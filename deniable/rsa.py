@@ -1,14 +1,16 @@
-def encryption(m, e, N):
-    """Encrypt message m as follow:
-    C = (m ** e) mod N."""
+"""RSA cryptosystem"""
 
-    return pow(m, e, N)
+def encryption(mes, exp, mod):
+    """Encrypt message 'mes' as follow:
+    C = (mes ** exp) % mod."""
 
-def decryption(c, d, N):
+    return pow(mes, exp, mod)
+
+def decryption(cipher, exp, mod):
     """Decrypt cipher c as follow:
-    M = (c ** d) % N."""
+    M = (cipher ** exp) % mod."""
 
-    if d == (d//1):
-        return pow(c, d, N)
+    if exp == (exp//1):
+        return pow(cipher, exp, mod)
 
-    return round((c**d) % N)
+    return round((cipher**exp) % mod)
