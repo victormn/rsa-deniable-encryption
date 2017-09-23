@@ -13,7 +13,7 @@ def read(*parts):
 LONG_DESCRIPTION = read('README.rst')
 
 setup(name='deniable',
-      version='v0.3.0',
+      version='v0.3.1',
       description='Deniable encryption application of a RSA cryptosystem',
       long_description=LONG_DESCRIPTION,
       url='https://github.com/victormn/rsa-deniable-encryption',
