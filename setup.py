@@ -21,5 +21,12 @@ setup(name='deniable',
       author_email='victor95nunes@gmail.com',
       tests_require=['pytest', 'pytest-cov'],
       license='MIT',
-      packages=['deniable'],
+      entry_points={
+          'console_scripts': [
+              'deniablecollision = deniable.scripts.deniablecollision:main',
+              'deniablekeys = deniable.scripts.deniablekeys:main',
+              'deniablersa = deniable.scripts.deniablersa:main',
+              ],
+          },
+      packages=['deniable', 'deniable.scripts'],
       zip_safe=False)

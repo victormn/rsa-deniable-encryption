@@ -9,4 +9,7 @@ test:
 coverage:
 	py.test --cov=deniable --cov-report=term --cov-report=html
 
-.PHONY: init test
+install:
+	python setup.py install
+
+.PHONY: init test install
