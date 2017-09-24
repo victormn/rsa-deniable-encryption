@@ -20,7 +20,7 @@ setup(name='deniable',
       author='Victor Nunes',
       author_email='victor95nunes@gmail.com',
       tests_require=['pytest', 'pytest-cov'],
-      install_requires=['pycrypto>=2.6.1'],
+      install_requires=['pycrypto>=2.6.1', 'python3-pip>=8.1.1'],
       license='MIT',
       entry_points={
           'console_scripts': [
@@ -34,8 +34,6 @@ setup(name='deniable',
       platforms='any',
       zip_safe=False,
       classifiers=[
-          'Programming Language :: Python',
-          'Programming Language :: Python :: 2',
           'Programming Language :: Python :: 3',
           'Natural Language :: English',
           'Intended Audience :: Developers',

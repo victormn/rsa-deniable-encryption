@@ -8,6 +8,19 @@ from Crypto.PublicKey import RSA
 
 getcontext().prec = 20
 
+def _get_bytes(string):
+    """Returns a integer that represents the bytes array of a given string"""
+    start = time()
+
+    str_bytes = list(str.encode(string))
+    aux = ""
+    for byte in str_bytes:
+        aux += "%03d" % (byte,)
+    num = int(aux)
+
+    debug("%s: collision: _get_bytes: %s [s]", asctime(localtime(time())), time() - start)
+    return num
+
 def _get_key(key):
     """Returns a RSA key attribute
     for given 'key' in PEM format"""
@@ -32,9 +45,9 @@ def _generate_pem(collision, key):
     """Returns a PEM format for given keys attributes"""
     start = time()
 
-    key = RSA.construct((long(key['n']), long(key['e']), key['d']))
+    key = RSA.construct((key['n'], key['e'], key['d']))
     key.d = collision*(10**20)
-    pem = key.exportKey()
+    pem = "".join(map(chr, key.exportKey()))
 
     debug("%s: collision_finder: _generate_pem: %s [s]", asctime(localtime(time())), time() - start)
     return pem
@@ -42,5 +55,5 @@ def _generate_pem(collision, key):
 def collision_finder(mes, cipher, pem):
     """Find RSA key parameter D such that the message 'mes' can be decrypted from 'cipher'."""
     key = _get_key(pem)
-    collision = _get_collision(mes, key['n'], cipher)
+    collision = _get_collision(_get_bytes(mes), key['n'], int(cipher))
     return _generate_pem(collision, key)

@@ -33,11 +33,11 @@ def main():
     args = parser.parse_args()
 
     mfile = open(args.message_path, 'r')
-    message = long(mfile.read())
+    message = mfile.read()
     mfile.close()
 
     cfile = open(args.cipher_path, 'r')
-    cipher = long(cfile.read())
+    cipher = cfile.read()
     cfile.close()
 
     kfile = open(args.publickey_path, 'r')

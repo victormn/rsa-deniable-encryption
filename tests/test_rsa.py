@@ -8,9 +8,9 @@ def test_encrypt_message():
     pub = """-----BEGIN PUBLIC KEY-----
 MCEwDQYJKoZIhvcNAQEBBQADEAAwDQIGAstna9HBAgMBAAE=
 -----END PUBLIC KEY-----"""
-    mes = 1234567890
+    mes = "foo"
     cipher = encryption(mes, pub)
-    assert cipher == 2648989795789
+    assert cipher == 2877160453915
 
 def test_decrypt_message():
     """Can we properly decrypt a message?"""
@@ -18,15 +18,15 @@ def test_decrypt_message():
 MC8CAQACBgLLZ2vRwQIDAQABAgUOx3XPUQIDHAz3AgMZgQcCAwWnGwICfDsCAxe2
 1g==
 -----END RSA PRIVATE KEY-----"""
-    cipher = 2648989795789
+    cipher = "2877160453915"
     mes = decryption(cipher, sec)
-    assert mes == 1234567890
+    assert mes == "foo"
 
 def test_cryptosystem():
     """Can we properly use the cryptosystem?"""
     keys = generate_keypair()
     (pub, sec) = (keys['pub'], keys['sec'])
-    mes1 = 1234567890
+    mes1 = "1 2"
     cipher = encryption(mes1, pub)
     mes2 = decryption(cipher, sec)
     assert mes1 == mes2

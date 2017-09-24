@@ -81,8 +81,10 @@ def _generate_pem(pk_e, sk_d, mod):
     public and private keys attributes"""
     start = time()
 
-    key = RSA.construct((long(mod), long(pk_e), long(sk_d)))
-    pem = {'sec': key.exportKey(), 'pub': key.publickey().exportKey()}
+    key = RSA.construct((mod, pk_e, sk_d))
+    sec = "".join(map(chr, key.exportKey()))
+    pub = "".join(map(chr, key.publickey().exportKey()))
+    pem = {'sec': sec, 'pub': pub}
 
     debug("%s: keys: _generate_pem: %s [s]", asctime(localtime(time())), time() - start)
     return pem
