@@ -30,4 +30,16 @@ setup(name='deniable',
               ],
           },
       packages=['deniable', 'deniable.scripts'],
-      zip_safe=False)
+      include_package_data=True,
+      platforms='any',
+      zip_safe=False,
+      classifiers=[
+          'Programming Language :: Python',
+          'Programming Language :: Python :: 2',
+          'Programming Language :: Python :: 3',
+          'Natural Language :: English',
+          'Intended Audience :: Developers',
+          'Operating System :: OS Independent',
+          'Topic :: Software Development :: Libraries :: Python Modules',
+          ],
+     )
