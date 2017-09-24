@@ -2,6 +2,7 @@
 
 import random
 import functools
+from Crypto.PublicKey import RSA
 
 def _gcd(*numbers):
     """Return the greatest common divisor from numbers."""
@@ -48,8 +49,15 @@ def _rand_prime(size, sieve):
         rand += 1
     return rand
 
+def _generate_pem(pk_e, sk_d, mod):
+    """Returns a PEM format for given
+    public and private keys attributes"""
+    key = RSA.construct((long(mod), long(pk_e), long(sk_d)))
+    return {'sec': key.exportKey(), 'pub': key.publickey().exportKey()}
+
 def generate_keypair():
-    """Generates RSA public and private key."""
+    """Returns a dictionary of RSA private [sec]
+    and public [pub] key in PEM format."""
     size = 22
     sieve = set(_create_sieve(2**size))
     pk_p = _rand_prime(size, sieve)
@@ -67,4 +75,4 @@ def generate_keypair():
         pk_g = _gcd(pk_e, phi)
 
     sk_d = _multiplicative_inverse(pk_e, phi)
-    return ({'e': pk_e, 'N': pk_n}, {'d': sk_d, 'N': pk_n})
+    return _generate_pem(pk_e, sk_d, pk_n)

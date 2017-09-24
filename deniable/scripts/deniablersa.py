@@ -11,14 +11,9 @@ def main():
         description='RSA cryptosystem.'
     )
     parser.add_argument(
-        'exp',
-        type=float,
-        help='RSA public/private key (E/D)',
-    )
-    parser.add_argument(
-        'mod',
-        type=int,
-        help='RSA public/private key (N)'
+        'key_path',
+        type=str,
+        help='Path to a RSA public/private key in PEM format',
     )
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
@@ -40,10 +35,14 @@ def main():
         print('Error: Input a valid message, please.')
         return
 
+    kfile = open(args.key_path, 'r')
+    key = kfile.read()
+    kfile.close()
+
     if args.enc:
-        print(encryption(message, args.exp, args.mod))
+        print(encryption(message, key))
     elif args.dec:
-        print(decryption(message, args.exp, args.mod))
+        print(decryption(message, key))
     else:
         print("Use --enc to encrypt a given message or --dec to decrypt")
 
