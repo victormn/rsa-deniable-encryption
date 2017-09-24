@@ -4,6 +4,8 @@ given message can be decrypted from a given cipher using this private key."""
 
 from __future__ import print_function
 import argparse
+from time import asctime, localtime, time
+from logging import debug, basicConfig, DEBUG
 from deniable.collision import collision_finder
 
 def main():
@@ -23,6 +25,11 @@ def main():
         'publickey_path',
         help='Public Key in pem format'
     )
+    parser.add_argument(
+        '--log_path',
+        type=str,
+        help='Create a log in given path'
+    )
     args = parser.parse_args()
 
     mfile = open(args.message_path, 'r')
@@ -37,7 +44,13 @@ def main():
     publickey = kfile.read()
     kfile.close()
 
+    if args.log_path is not None:
+        path = args.log_path + "/latency.log"
+        basicConfig(filename=path, level=DEBUG)
+
+    start = time()
     print(collision_finder(message, cipher, publickey))
+    debug("%s: collision_finder: %s [s]", asctime(localtime(time())), time() - start)
 
 if __name__ == '__main__':
     main()
