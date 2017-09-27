@@ -13,14 +13,14 @@ def read(*parts):
 LONG_DESCRIPTION = read('README.rst')
 
 setup(name='deniable',
-      version='v0.5.0',
+      version='v0.5.1',
       description='Deniable encryption application of a RSA cryptosystem',
       long_description=LONG_DESCRIPTION,
       url='https://github.com/victormn/rsa-deniable-encryption',
       author='Victor Nunes',
       author_email='victor95nunes@gmail.com',
       tests_require=['pytest', 'pytest-cov'],
-      install_requires=['pycrypto>=2.6.1', 'python3-pip>=8.1.1'],
+      install_requires=['pycrypto>=2.6.1'],
       license='MIT',
       entry_points={
           'console_scripts': [

@@ -3,6 +3,11 @@ RSA Deniable Encryption
 
 Deniable encryption application of a RSA cryptosystem
 
+Requires
+--------
+python3-pip
+
+
 Contact
 -------
 

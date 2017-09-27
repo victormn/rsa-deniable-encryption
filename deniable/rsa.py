@@ -8,6 +8,27 @@ from Crypto.PublicKey import RSA
 
 decimal.getcontext().prec = 20
 
+def _slice(string, size):
+    """Given a string, returns a slice array of int such that each element has size 'size'."""
+    start = time()
+
+    i = 0
+    aux = ""
+    result = list()
+    for char in string:
+        aux += char
+        i += 1
+        if i == size:
+            result.append(int(aux))
+            i = 0
+            aux = ""
+
+    if i > 0:
+        result.append(int(aux))
+
+    debug("%s: rsa: _slice: %s [s]", asctime(localtime(time())), time() - start)
+    return result
+
 def _get_bytes(string):
     """Returns a integer that represents the bytes array of a given string"""
     start = time()
@@ -16,18 +37,17 @@ def _get_bytes(string):
     aux = ""
     for byte in str_bytes:
         aux += "%03d" % (byte,)
-    num = int(aux)
 
     debug("%s: rsa: _get_bytes: %s [s]", asctime(localtime(time())), time() - start)
-    return num
+    return aux
 
-def _get_string(num):
+def _get_string(str_num):
     """Resturns a string that can be represented as the bytes array of a given num"""
     start = time()
 
-    str_num = str(num)
     if len(str_num) % 3 is not 0:
-        str_num = "0" + str_num
+        str_num = "0"*(3 - (len(str_num) % 3)) + str_num
+
     i = 0
     aux = ""
     bytes_list = list()
@@ -65,18 +85,38 @@ def _get_secret_key(key):
     debug("%s: rsa: _get_secret_key: %s [s]", asctime(localtime(time())), time() - start)
     return sec
 
+def _trim(num):
+    string = str(num)
+    if len(string) <= 3:
+        return "%03d" % (num,)
+    if len(string) <= 6:
+        return "%06d" % (num,)
+
+    return "%09d" % (num,)
+
 def encryption(mes, pub):
     """Encrypt message 'mes' using 'pub' public key."""
     exp, mod = _get_public_key(pub)
-    return pow(_get_bytes(mes), exp, mod)
+    sliced = _slice(_get_bytes(mes), 9)
+    aux = ""
+    for piece in sliced:
+        aux += "%015d" % (pow(piece, exp, mod),)
+    return aux
 
 def decryption(cipher, sec):
     """Decrypt cipher 'c' using 'sec' secret key"""
     exp, mod = _get_secret_key(sec)
+    sliced = _slice(cipher, 15)
+    aux = ""
     if exp < 10**20:
-        num = pow(int(cipher), exp, mod)
-        return _get_string(num)
+        for piece in sliced:
+            aux += _trim(pow(piece, exp, mod))
+        return _get_string(aux)
 
-    exp = decimal.Decimal(exp/(10**20))
-    num = int(round((int(cipher)**exp) % mod))
-    return _get_string(num)
+    exp_sliced = _slice(str(exp), 30)
+    i = 0
+    for piece in sliced:
+        exp_current = decimal.Decimal(exp_sliced[i]/(10**20))
+        aux += str(int(round((piece**exp_current) % mod)))
+        i += 1
+    return _get_string(aux)
