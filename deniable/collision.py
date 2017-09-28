@@ -5,21 +5,9 @@ from time import asctime, localtime, time
 from logging import debug
 from decimal import Decimal, getcontext
 from Crypto.PublicKey import RSA
+from deniable.utils import slice_n, get_bytes
 
 getcontext().prec = 20
-
-def _get_bytes(string):
-    """Returns a integer that represents the bytes array of a given string"""
-    start = time()
-
-    str_bytes = list(str.encode(string))
-    aux = ""
-    for byte in str_bytes:
-        aux += "%03d" % (byte,)
-    num = int(aux)
-
-    debug("%s: collision: _get_bytes: %s [s]", asctime(localtime(time())), time() - start)
-    return num
 
 def _get_key(key):
     """Returns a RSA key attribute
@@ -37,16 +25,17 @@ def _get_collision(mes, mod, cipher):
     start = time()
 
     collision = Decimal(Decimal(math.log(mes + mod))/Decimal(math.log(cipher)))
+    collision = int(collision*(10**20))
 
     debug("%s: collision_finder: collision: %s [s]", asctime(localtime(time())), time() - start)
-    return collision
+    return str(collision)
 
 def _generate_pem(collision, key):
     """Returns a PEM format for given keys attributes"""
     start = time()
 
     key = RSA.construct((key['n'], key['e'], key['d']))
-    key.d = collision*(10**20)
+    key.d = collision
     pem = "".join(map(chr, key.exportKey()))
 
     debug("%s: collision_finder: _generate_pem: %s [s]", asctime(localtime(time())), time() - start)
@@ -55,5 +44,12 @@ def _generate_pem(collision, key):
 def collision_finder(mes, cipher, pem):
     """Find RSA key parameter D such that the message 'mes' can be decrypted from 'cipher'."""
     key = _get_key(pem)
-    collision = _get_collision(_get_bytes(mes), key['n'], int(cipher))
-    return _generate_pem(collision, key)
+    s_cipher = slice_n(cipher, 15)
+    s_mes = get_bytes(mes)
+
+    i = 0
+    collision = ""
+    for piece in s_mes:
+        collision += _get_collision(piece, key['n'], s_cipher[i])
+        i += 1
+    return _generate_pem(int(collision), key)
