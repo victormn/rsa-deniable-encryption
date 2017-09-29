@@ -49,12 +49,12 @@ def _multiplicative_inverse(exp, phi):
     debug("%s: keys: _multiplicative_inverse: %s [s]", asctime(localtime(time())), time() - start)
     return aux2
 
-def _rand_prime(size, sieve):
+def _rand_prime():
     """Return a random prime >= size using a sieve set."""
     start = time()
 
-    rand = random.randrange(2**(size-2), 2**size)
-    while not rand in sieve:
+    rand = random.randrange(2**20, 2**22)
+    while not rand in SIEVE:
         rand += 1
 
     debug("%s: keys: _rand_prime: %s [s]", asctime(localtime(time())), time() - start)
@@ -76,9 +76,8 @@ def _generate_pem(pk_e, sk_d, mod):
 def generate_keypair():
     """Returns a dictionary of RSA private [sec]
     and public [pub] key in PEM format."""
-    size = 22
-    pk_p = _rand_prime(size, SIEVE)
-    pk_q = _rand_prime(size, SIEVE)
+    pk_p = _rand_prime()
+    pk_q = _rand_prime()
 
     if pk_p > pk_q:
         (pk_p, pk_q) = (pk_q, pk_p)
