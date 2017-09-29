@@ -1,8 +1,9 @@
 """Find a private key such that a given message can be decrypted from a given cipher using RSA."""
 
 import math
+import sys
 from time import asctime, localtime, time
-from logging import debug
+from logging import debug, error
 from decimal import Decimal, getcontext
 from Crypto.PublicKey import RSA
 from deniable.utils import slice_n, get_bytes
@@ -15,7 +16,12 @@ def _get_key(key):
     start = time()
 
     keys = RSA.importKey(key)
-    dic_keys = {'e': keys.e, 'd': keys.d, 'n': keys.n}
+    dic_keys = {'e': "", 'd': "", 'n': ""}
+    try:
+        dic_keys = {'e': keys.e, 'd': keys.d, 'n': keys.n}
+    except AttributeError:
+        error("this key is not a private key")
+        sys.exit()
 
     debug("%s: collision_finder: _get_key: %s [s]", asctime(localtime(time())), time() - start)
     return dic_keys
@@ -50,6 +56,10 @@ def collision_finder(mes, cipher, pem):
     i = 0
     collision = ""
     for piece in s_mes:
-        collision += _get_collision(piece, key['n'], s_cipher[i])
+        try:
+            collision += _get_collision(piece, key['n'], s_cipher[i])
+        except IndexError:
+            error("the second message length must be less than encripted message length")
+            sys.exit()
         i += 1
     return _generate_pem(int(collision), key)

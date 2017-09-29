@@ -2,8 +2,9 @@
 
 from __future__ import division
 import decimal
+import sys
 from time import asctime, localtime, time
-from logging import debug
+from logging import debug, error
 from Crypto.PublicKey import RSA
 from deniable.utils import get_bytes, get_string, slice_n, trim
 
@@ -15,7 +16,12 @@ def _get_public_key(key):
     start = time()
 
     keys = RSA.importKey(key)
-    pub = (keys.e, keys.n)
+    pub = ("", "")
+    try:
+        pub = (keys.e, keys.n)
+    except AttributeError:
+        error("this key is not a valid key")
+        sys.exit()
 
     debug("%s: rsa: _get_public_key: %s [s]", asctime(localtime(time())), time() - start)
     return pub
@@ -26,7 +32,12 @@ def _get_secret_key(key):
     start = time()
 
     keys = RSA.importKey(key)
-    sec = (keys.d, keys.n)
+    sec = ("", "")
+    try:
+        sec = (keys.d, keys.n)
+    except AttributeError:
+        error("this key is not a private key")
+        sys.exit()
 
     debug("%s: rsa: _get_secret_key: %s [s]", asctime(localtime(time())), time() - start)
     return sec
@@ -57,6 +68,10 @@ def decryption(cipher, sec):
     i = 0
     for piece in exp_sliced:
         exp_current = decimal.Decimal(piece/(10**20))
-        aux += trim(int(round((sliced[i]**exp_current) % mod)))
+        try:
+            aux += trim(int(round((sliced[i]**exp_current) % mod)))
+        except IndexError:
+            error("wrong private key")
+            sys.exit()
         i += 1
     return get_string(aux)
