@@ -49,22 +49,6 @@ def _multiplicative_inverse(exp, phi):
     debug("%s: keys: _multiplicative_inverse: %s [s]", asctime(localtime(time())), time() - start)
     return aux2
 
-# def _create_sieve(num):
-#     """Return all primes <= num."""
-#     start = time()
-
-#     np1 = num + 1
-#     sli = list(range(np1))
-#     sli[1] = 0
-#     sqrtn = int(round(num**0.5))
-#     for i in range(2, sqrtn + 1):
-#         if sli[i]:
-#             sli[i*i: np1: i] = [0] * len(range(i*i, np1, i))
-#     ret = filter(None, sli)
-
-#     debug("%s: keys: _create_sieve: %s [s]", asctime(localtime(time())), time() - start)
-#     return ret
-
 def _rand_prime(size, sieve):
     """Return a random prime >= size using a sieve set."""
     start = time()
@@ -93,7 +77,6 @@ def generate_keypair():
     """Returns a dictionary of RSA private [sec]
     and public [pub] key in PEM format."""
     size = 22
-    # sieve = set(_create_sieve(2**size))
     pk_p = _rand_prime(size, SIEVE)
     pk_q = _rand_prime(size, SIEVE)
 
