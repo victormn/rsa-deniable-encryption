@@ -9,35 +9,24 @@ This project create a RSA cryptosystem with deniability. Three scripts was creat
 
 **Example:**
 
-Given:
+.. code-block:: bash
 
-   | m1 = message 1                     
-   |                                    
-   | m2 = message 2                     
-   |                                    
-   | c = cipher                         
-   |                                    
-   | pk = public key                    
-   |                                    
-   | sk1 = secret key 1                 
-   |                                    
-   | sk2 = secret key 2                 
-   |                                    
-   | E() = encryption algorithm         
-   |                                    
-   | D() = decryption algorithm         
-   |                                    
-   | NSK() = new secret key algorithm   
+    m1 = message 1                     
+    m2 = message 2                     
+    c = cipher                         
+    pk = public key                    
+    sk1 = secret key 1                 
+    sk2 = secret key 2                 
+    E() = encryption algorithm         
+    D() = decryption algorithm         
+    NSK() = new secret key algorithm  
 
-Then:
+.. code-block:: bash
 
-   | c = E(m1, pk)                      
-   |                                    
-   | m1 = D(c, sk1)                     
-   |                                    
-   | sk2 = NSK(c, sk1, m2)            	
-   |                                    
-   | m2 = D(c, sk2)                   	
+   c = E(m1, pk)                                    
+   m1 = D(c, sk1)                       
+   sk2 = NSK(c, sk1, m2)              
+   m2 = D(c, sk2)                   	
 
 
 Quickstart
