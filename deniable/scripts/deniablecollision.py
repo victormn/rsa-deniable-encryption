@@ -22,8 +22,8 @@ def main():
         help='Message'
     )
     parser.add_argument(
-        'publickey_path',
-        help='Public Key in pem format'
+        'secretkey_path',
+        help='Secret Key in pem format'
     )
     parser.add_argument(
         '--log_path',

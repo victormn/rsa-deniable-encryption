@@ -14,7 +14,7 @@ def main():
     )
     parser.add_argument(
         '-p',
-        '--path',
+        '--key_path',
         type=str,
         help='Path to save the keys',
     )
