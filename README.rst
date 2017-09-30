@@ -1,6 +1,11 @@
 RSA Deniable Encryption
 =======================
 
+.. image:: https://travis-ci.org/victormn/rsa-deniable-encryption.svg?branch=master
+    :target: https://travis-ci.org/victormn/rsa-deniable-encryption
+.. image:: https://coveralls.io/repos/github/victormn/rsa-deniable-encryption/badge.svg
+    :target: https://coveralls.io/github/victormn/rsa-deniable-encryption
+
 This project create a RSA cryptosystem with deniability. Three scripts was created:
 
 - Generates RSA key pair

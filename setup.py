@@ -19,7 +19,7 @@ setup(name='deniable',
       url='https://github.com/victormn/rsa-deniable-encryption',
       author='Victor Nunes',
       author_email='victor95nunes@gmail.com',
-      tests_require=['pytest', 'pytest-cov'],
+      tests_require=['pytest', 'pytest-cov', 'python-coveralls'],
       install_requires=['pycrypto>=2.6.1'],
       license='MIT',
       entry_points={

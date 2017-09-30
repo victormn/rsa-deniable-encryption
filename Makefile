@@ -12,6 +12,6 @@ test:
 	py.test tests
 
 coverage:
-	py.test --cov-config tests/.coveragerc --cov=deniable --cov-report=term --cov-report=html
+	py.test --cov-config tests/.coveragerc -v --cov=deniable --cov-report=term --cov-report=html
 
 .PHONY: init test install build
