@@ -29,6 +29,10 @@ This project create a RSA cryptosystem with deniability. Three scripts was creat
    m2 = D(c, sk2)                   	
 
 
+.. contents::
+
+.. section-numbering::
+
 Quickstart
 ----------
 
